@@ -2,43 +2,84 @@
 $message = '';
 $notice = "⚠️ Recuerda: esta página es para subir nuevas versiones APK. Cada vez que se actualiza la página, asegúrate de revisar los datos antes de subir un archivo.";
 
+// Configuración de PHP temporal para archivos grandes (si el hosting lo permite)
+ini_set('upload_max_filesize', '50M');
+ini_set('post_max_size', '50M');
+ini_set('max_execution_time', '300');
+
+$uploadDir = __DIR__ . '/uploads/'; // Carpeta de subida
+
+// Crear carpeta uploads si no existe
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $versionCode = intval($_POST['versionCode']);
     $versionName = htmlspecialchars($_POST['versionName']);
     $agregados = htmlspecialchars($_POST['agregados']);
     $correcciones = htmlspecialchars($_POST['correcciones']);
 
-    if (isset($_FILES['apkFile']) && $_FILES['apkFile']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['apkFile']['tmp_name'];
-        $fileName = $_FILES['apkFile']['name'];
-        $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+    if (isset($_FILES['apkFile'])) {
+        $fileError = $_FILES['apkFile']['error'];
 
-        // Validar extensión
-        if (strtolower($fileExtension) !== 'apk') {
-            $message = "❌ Solo se permiten archivos APK.";
-        } else {
-            // Renombrar archivo para evitar conflictos
-            $newFileName = 'app_' . time() . '.' . $fileExtension;
-            $filePath = __DIR__ . '/' . $newFileName; // se guarda en la misma carpeta que el script
+        if ($fileError === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['apkFile']['tmp_name'];
+            $fileName = $_FILES['apkFile']['name'];
+            $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-            if (move_uploaded_file($fileTmpPath, $filePath)) {
-                // Crear o actualizar version.json
-                $jsonData = [
-                    'versionCode' => $versionCode,
-                    'versionName' => $versionName,
-                    'downloadUrl' => (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/{$newFileName}",
-                    'agregados' => $agregados,
-                    'correcciones' => $correcciones
-                ];
-
-                file_put_contents('version.json', json_encode($jsonData, JSON_PRETTY_PRINT));
-                $message = "✅ APK subida correctamente. Última versión actualizada.";
+            if (strtolower($fileExtension) !== 'apk') {
+                $message = "❌ Solo se permiten archivos APK.";
             } else {
-                $message = "❌ Error al mover el archivo.";
+                // Renombrar archivo
+                $newFileName = 'app_' . time() . '.' . $fileExtension;
+                $filePath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $filePath)) {
+                    // Crear o actualizar version.json
+                    $jsonData = [
+                        'versionCode' => $versionCode,
+                        'versionName' => $versionName,
+                        'downloadUrl' => (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/uploads/{$newFileName}",
+                        'agregados' => $agregados,
+                        'correcciones' => $correcciones
+                    ];
+
+                    file_put_contents('version.json', json_encode($jsonData, JSON_PRETTY_PRINT));
+                    $message = "✅ APK subida correctamente. Última versión actualizada.";
+                } else {
+                    $message = "❌ Error al mover el archivo a la carpeta uploads. Verifica permisos de escritura.";
+                }
+            }
+        } else {
+            // Mostrar el código de error
+            $message = "❌ Error al subir APK. Código de error: $fileError";
+
+            // Interpretación de errores comunes
+            switch ($fileError) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    $message .= " (Archivo demasiado grande)";
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    $message .= " (Subida parcial del archivo)";
+                    break;
+                case UPLOAD_ERR_NO_FILE:
+                    $message .= " (No se subió ningún archivo)";
+                    break;
+                case UPLOAD_ERR_NO_TMP_DIR:
+                    $message .= " (Falta carpeta temporal en el servidor)";
+                    break;
+                case UPLOAD_ERR_CANT_WRITE:
+                    $message .= " (No se pudo escribir el archivo en el servidor)";
+                    break;
+                case UPLOAD_ERR_EXTENSION:
+                    $message .= " (Extensión PHP bloqueó la subida)";
+                    break;
             }
         }
     } else {
-        $message = "❌ Error al subir el APK.";
+        $message = "❌ No se detectó ningún archivo para subir.";
     }
 }
 ?>
