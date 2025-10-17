@@ -8,6 +8,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).send("Método no permitido");
 
   try {
+    // Parsear formulario
     const { fields, files } = await new Promise((resolve, reject) => {
       const form = formidable({ multiples: false });
       form.parse(req, (err, fields, files) => {
@@ -19,47 +20,55 @@ export default async function handler(req, res) {
     console.log("FIELDS recibidos:", fields);
     console.log("FILES recibidos:", files);
 
-    const fileKeys = Object.keys(files);
-    if (fileKeys.length === 0) {
-      return res.status(400).send("No se detectó ningún archivo");
+    // Tomar el primer archivo del array
+    if (!files.apkFile || files.apkFile.length === 0) {
+      return res.status(400).send("No se detectó ningún archivo APK");
     }
 
-    const apkFile = files[fileKeys[0]];
-    const filePath = apkFile.filepath || apkFile.file?.filepath || apkFile.path;
+    const apkFile = files.apkFile[0];
+    const filePath = apkFile.filepath;
+
     if (!filePath) return res.status(400).send("No se encontró el archivo APK correctamente");
 
     console.log("Archivo APK detectado:", filePath);
 
+    // Leer APK y convertir a base64
     const fileBuffer = await fs.promises.readFile(filePath);
     const fileContent = fileBuffer.toString("base64");
 
     const newName = `app-${Date.now()}.apk`;
     const apkPath = `public/apk/${newName}`;
 
+    // Subir APK a GitHub
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
     const owner = process.env.GITHUB_OWNER;
     const repo = process.env.GITHUB_REPO;
     const branch = process.env.GITHUB_BRANCH || "main";
 
     await octokit.rest.repos.createOrUpdateFileContents({
-      owner, repo, path: apkPath,
+      owner,
+      repo,
+      path: apkPath,
       message: `Subida nueva versión ${fields.versionName || "sin nombre"}`,
       content: fileContent,
       branch,
     });
 
+    // Crear version.json
     const versionData = {
       versionCode: parseInt(fields.versionCode) || 0,
       versionName: fields.versionName || "sin nombre",
       agregados: fields.agregados || "",
       correcciones: fields.correcciones || "",
-      downloadUrl: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/public/apk/${newName}`
+      downloadUrl: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/public/apk/${newName}`,
     };
 
     const versionContent = Buffer.from(JSON.stringify(versionData, null, 2)).toString("base64");
 
     await octokit.rest.repos.createOrUpdateFileContents({
-      owner, repo, path: "public/version.json",
+      owner,
+      repo,
+      path: "public/version.json",
       message: `Actualización versión ${fields.versionName || "sin nombre"}`,
       content: versionContent,
       branch,
