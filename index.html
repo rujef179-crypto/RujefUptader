@@ -1,65 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subida de APK</title>
+<meta charset="UTF-8">
+<title>Subir APK</title>
 </head>
 <body>
-  <h1>Subir APK a GitHub</h1>
-  <form id="apkForm" enctype="multipart/form-data">
-    <label>
-      Archivo APK:
-      <input type="file" name="apkFile" required />
-    </label><br><br>
+  <h1>Subir APK</h1>
+  <form id="uploadForm" enctype="multipart/form-data" method="POST" action="/api/upload">
+    <label>APK:</label>
+    <input type="file" name="apkFile" accept=".apk" required /><br/><br/>
 
-    <label>
-      Version Code:
-      <input type="number" name="versionCode" required />
-    </label><br><br>
+    <label>Version Code:</label>
+    <input type="text" name="versionCode" required /><br/><br/>
 
-    <label>
-      Version Name:
-      <input type="text" name="versionName" required />
-    </label><br><br>
+    <label>Version Name:</label>
+    <input type="text" name="versionName" required /><br/><br/>
 
-    <label>
-      Agregados:
-      <input type="text" name="agregados" />
-    </label><br><br>
+    <label>Agregados:</label>
+    <input type="text" name="agregados" /><br/><br/>
 
-    <label>
-      Correcciones:
-      <input type="text" name="correcciones" />
-    </label><br><br>
+    <label>Correcciones:</label>
+    <input type="text" name="correcciones" /><br/><br/>
 
     <button type="submit">Subir APK</button>
   </form>
-
-  <div id="status"></div>
-
-  <script>
-    const form = document.getElementById("apkForm");
-    const status = document.getElementById("status");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      status.innerText = "⏳ Subiendo APK...";
-
-      try {
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const text = await response.text();
-        status.innerText = text;
-      } catch (err) {
-        console.error(err);
-        status.innerText = "❌ Error al subir APK";
-      }
-    });
-  </script>
 </body>
 </html>
