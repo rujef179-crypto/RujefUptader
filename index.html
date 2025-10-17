@@ -19,6 +19,7 @@ button:hover { background: #45a049; }
 
 <div class="container">
     <h2>Subir nueva versión APK</h2>
+    <!-- IMPORTANTE: enctype multipart/form-data -->
     <form id="uploadForm" enctype="multipart/form-data">
         <input type="number" name="versionCode" placeholder="Código de versión (número)" required>
         <input type="text" name="versionName" placeholder="Nombre de versión (ej: 1.0.5)" required>
@@ -40,10 +41,16 @@ form.addEventListener("submit", async (e) => {
     messageDiv.innerText = "Subiendo APK...";
 
     try {
+        // Ver logs de lo que se envía
+        for (const pair of data.entries()) {
+            console.log(pair[0]+ ':', pair[1]);
+        }
+
         const response = await fetch("/api/upload", {
             method: "POST",
             body: data
         });
+
         const text = await response.text();
         messageDiv.innerText = text;
     } catch (err) {
