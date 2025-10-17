@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "formidable": "^3.7.4",
+    "formidable": "^3.7.1",
     "octokit": "^4.0.0"
   }
 }
+
