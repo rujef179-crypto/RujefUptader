@@ -2,3 +2,12 @@
   "formidable": "^3.7.4",
   "octokit": "^4.0.0"
 }
+{
+  "name": "apk-uploader",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "formidable": "^3.7.4",
+    "octokit": "^4.0.0"
+  }
+}
