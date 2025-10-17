@@ -1,68 +1,56 @@
-import { Octokit } from "octokit";
-import formidable from "formidable";
-import fs from "fs";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Actualización APK</title>
+<style>
+body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+.container { background: #fff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+h2 { color: #333; margin-bottom: 20px; }
+input, textarea { width: 100%; padding: 10px; margin: 10px 0 20px 0; border-radius: 6px; border: 1px solid #ccc; }
+textarea { resize: vertical; min-height: 60px; }
+button { background: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+button:hover { background: #45a049; }
+.message { margin-top: 20px; font-weight: bold; }
+</style>
+</head>
+<body>
 
-export const config = { api: { bodyParser: false } };
+<div class="container">
+    <h2>Subir nueva versión APK</h2>
+    <form id="uploadForm">
+        <input type="number" name="versionCode" placeholder="Código de versión (número)" required>
+        <input type="text" name="versionName" placeholder="Nombre de versión (ej: 1.0.5)" required>
+        <textarea name="agregados" placeholder="Agregados en esta versión"></textarea>
+        <textarea name="correcciones" placeholder="Correcciones en esta versión"></textarea>
+        <input type="file" name="apkFile" accept=".apk" required>
+        <button type="submit">Subir APK</button>
+    </form>
+    <div id="message" class="message"></div>
+</div>
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).send("Método no permitido");
+<script>
+const form = document.getElementById("uploadForm");
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
 
-  const form = new formidable.IncomingForm();
-
-  form.parse(req, async (err, fields, files) => {
-    if (err) return res.status(500).send("Error al procesar el formulario");
+    const messageDiv = document.getElementById("message");
+    messageDiv.innerText = "Subiendo APK...";
 
     try {
-      const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-
-      const owner = process.env.GITHUB_OWNER;
-      const repo = process.env.GITHUB_REPO;
-      const branch = process.env.GITHUB_BRANCH || "main";
-
-      const apkFile = files.apkFile;
-      if (!apkFile) return res.status(400).send("No se detectó ningún archivo APK");
-
-      // Leer APK como base64
-      const fileBuffer = await fs.promises.readFile(apkFile.filepath);
-      const fileContent = fileBuffer.toString("base64");
-
-      const newName = `app-${Date.now()}.apk`;
-      const apkPath = `public/apk/${newName}`;
-
-      // Subir APK a GitHub
-      await octokit.rest.repos.createOrUpdateFileContents({
-        owner,
-        repo,
-        path: apkPath,
-        message: `Subida nueva versión ${fields.versionName}`,
-        content: fileContent,
-        branch,
-      });
-
-      // Crear version.json
-      const versionData = {
-        versionCode: parseInt(fields.versionCode),
-        versionName: fields.versionName,
-        agregados: fields.agregados,
-        correcciones: fields.correcciones,
-        downloadUrl: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/public/apk/${newName}`
-      };
-
-      const versionContent = Buffer.from(JSON.stringify(versionData, null, 2)).toString("base64");
-
-      await octokit.rest.repos.createOrUpdateFileContents({
-        owner,
-        repo,
-        path: "public/version.json",
-        message: `Actualización versión ${fields.versionName}`,
-        content: versionContent,
-        branch,
-      });
-
-      res.status(200).send("✅ APK subida y version.json actualizado correctamente en GitHub.");
-    } catch (e) {
-      console.error(e);
-      res.status(500).send("❌ Error al subir el APK: " + e.message);
+        const response = await fetch("/api/upload", {
+            method: "POST",
+            body: data
+        });
+        const text = await response.text();
+        messageDiv.innerText = text;
+    } catch (err) {
+        messageDiv.innerText = "Error al subir APK: " + err;
     }
-  });
-}
+});
+</script>
+
+</body>
+</html>
