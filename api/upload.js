@@ -3,28 +3,30 @@ import formidable from "formidable";
 import fs from "fs";
 
 export const config = {
-  api: { bodyParser: false }
+  api: {
+    bodyParser: false
+  }
 };
 
 export default async function handler(req, res) {
-  if (req.method !== "POST")
-    return res.status(405).send("Método no permitido");
+  if (req.method !== "POST") return res.status(405).send("Método no permitido");
 
-  const form = formidable({ multiples: false });
+  const form = formidable({ multiples: false, keepExtensions: true });
 
   form.parse(req, async (err, fields, files) => {
     if (err) return res.status(500).send("Error al procesar el formulario");
 
-    console.info("FIELDS recibidos:", fields);
-    console.info("FILES recibidos:", files);
+    console.log("FIELDS recibidos:", fields);
+    console.log("FILES recibidos:", files);
 
-    const apkFile = files.apkFile?.[0] || files.apkFile; // soporta arrays o single
-    if (!apkFile) return res.status(400).send("No se encontró el archivo APK correctamente");
+    const apkFile = files.apkFile?.[0] || files.apkFile; // soporte arrays y único archivo
+    if (!apkFile) return res.status(400).send("No se detectó ningún archivo APK");
 
-    console.info("Archivo APK detectado:", apkFile.filepath);
+    console.log("Archivo APK detectado:", apkFile.filepath);
 
     try {
       const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
       const owner = process.env.GITHUB_OWNER;
       const repo = process.env.GITHUB_REPO;
       const branch = process.env.GITHUB_BRANCH || "main";
@@ -34,6 +36,7 @@ export default async function handler(req, res) {
       const newName = `app-${Date.now()}.apk`;
       const apkPath = `public/apk/${newName}`;
 
+      // Subir APK
       await octokit.rest.repos.createOrUpdateFileContents({
         owner,
         repo,
@@ -43,6 +46,7 @@ export default async function handler(req, res) {
         branch
       });
 
+      // Crear version.json
       const versionData = {
         versionCode: parseInt(fields.versionCode),
         versionName: fields.versionName,
@@ -65,7 +69,7 @@ export default async function handler(req, res) {
       res.status(200).send("✅ APK subida y version.json actualizado correctamente en GitHub.");
     } catch (e) {
       console.error("Error al subir APK:", e);
-      res.status(500).send(`❌ Error al subir el APK: ${e.message}`);
+      res.status(500).send("❌ Error al subir el APK: " + e.message);
     }
   });
 }
