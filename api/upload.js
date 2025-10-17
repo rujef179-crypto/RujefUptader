@@ -1,11 +1,10 @@
 import { Octokit } from "octokit";
 import formidable from "formidable";
-import fs from "fs";
+import fs from "fs-extra";
+import path from "path";
 
 export const config = {
-  api: {
-    bodyParser: false
-  }
+  api: { bodyParser: false }
 };
 
 export default async function handler(req, res) {
@@ -16,27 +15,31 @@ export default async function handler(req, res) {
   form.parse(req, async (err, fields, files) => {
     if (err) return res.status(500).send("Error al procesar el formulario");
 
-    console.log("FIELDS recibidos:", fields);
-    console.log("FILES recibidos:", files);
-
-    const apkFile = files.apkFile?.[0] || files.apkFile; // soporte arrays y único archivo
+    const apkFile = files.apkFile?.[0] || files.apkFile;
     if (!apkFile) return res.status(400).send("No se detectó ningún archivo APK");
 
-    console.log("Archivo APK detectado:", apkFile.filepath);
-
     try {
-      const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-
       const owner = process.env.GITHUB_OWNER;
       const repo = process.env.GITHUB_REPO;
       const branch = process.env.GITHUB_BRANCH || "main";
+      const token = process.env.GITHUB_TOKEN;
 
-      const fileBuffer = await fs.promises.readFile(apkFile.filepath);
+      if (!owner || !repo || !token) 
+        return res.status(500).send("Variables de entorno incompletas");
+
+      const octokit = new Octokit({ auth: token });
+
+      // Crear carpeta apk si no existe
+      const apkDir = path.join(process.cwd(), "public", "apk");
+      await fs.ensureDir(apkDir);
+
+      // Leer APK y convertir a base64
+      const fileBuffer = await fs.readFile(apkFile.filepath);
       const fileContent = fileBuffer.toString("base64");
       const newName = `app-${Date.now()}.apk`;
       const apkPath = `public/apk/${newName}`;
 
-      // Subir APK
+      // Subir APK a GitHub
       await octokit.rest.repos.createOrUpdateFileContents({
         owner,
         repo,
@@ -50,8 +53,8 @@ export default async function handler(req, res) {
       const versionData = {
         versionCode: parseInt(fields.versionCode),
         versionName: fields.versionName,
-        agregados: fields.agregados,
-        correcciones: fields.correcciones,
+        agregados: fields.agregados || "",
+        correcciones: fields.correcciones || "",
         downloadUrl: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/public/apk/${newName}`
       };
 
