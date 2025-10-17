@@ -19,7 +19,8 @@ button:hover { background: #45a049; }
 
 <div class="container">
     <h2>Subir nueva versión APK</h2>
-    <form id="uploadForm">
+    <!-- CORRECCIÓN IMPORTANTE: enctype="multipart/form-data" -->
+    <form id="uploadForm" enctype="multipart/form-data">
         <input type="number" name="versionCode" placeholder="Código de versión (número)" required>
         <input type="text" name="versionName" placeholder="Nombre de versión (ej: 1.0.5)" required>
         <textarea name="agregados" placeholder="Agregados en esta versión"></textarea>
