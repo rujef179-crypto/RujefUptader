@@ -2,9 +2,11 @@
   "name": "apk-uploader",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "start": "vercel dev"
+  },
   "dependencies": {
-   "formidable": "latest"
+    "formidable": "^3.7.1",
     "octokit": "^4.0.0"
   }
 }
-
