@@ -4,14 +4,12 @@ import fs from "fs";
 
 export const config = {
   api: {
-    bodyParser: false, // desactiva el body parser para recibir archivos
+    bodyParser: false,
   },
 };
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).send("Método no permitido");
-  }
+  if (req.method !== "POST") return res.status(405).send("Método no permitido");
 
   const form = new formidable.IncomingForm();
 
@@ -29,24 +27,22 @@ export default async function handler(req, res) {
       console.log("OWNER:", owner, "REPO:", repo, "BRANCH:", branch);
 
       if (!owner || !repo) {
-        return res.status(500).send("❌ OWNER o REPO no configurados en las variables de entorno");
+        return res.status(500).send("❌ OWNER o REPO no configurados en variables de entorno");
       }
 
       const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-      const apkFile = files.apkFile?.[0]; // formidable devuelve un array
+      const apkFile = files.apkFile?.[0];
       if (!apkFile) return res.status(400).send("No se encontró el archivo APK correctamente");
 
       console.log("Archivo APK detectado:", apkFile.filepath);
 
-      // Leer APK como base64
       const fileBuffer = await fs.promises.readFile(apkFile.filepath);
       const fileContent = fileBuffer.toString("base64");
 
       const newName = `app-${Date.now()}.apk`;
       const apkPath = `public/apk/${newName}`;
 
-      // Subir APK a GitHub
       await octokit.rest.repos.createOrUpdateFileContents({
         owner,
         repo,
@@ -56,7 +52,6 @@ export default async function handler(req, res) {
         branch,
       });
 
-      // Crear version.json
       const versionData = {
         versionCode: parseInt(fields.versionCode),
         versionName: fields.versionName,
