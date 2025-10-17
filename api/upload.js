@@ -1,6 +1,6 @@
-import formidable from "formidable";
+import { Octokit } from "octokit";
+import { IncomingForm } from "formidable";
 import fs from "fs";
-import path from "path";
 
 export const config = {
   api: {
@@ -10,54 +10,67 @@ export const config = {
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    res.status(405).send("Método no permitido");
-    return;
+    return res.status(405).send("Método no permitido");
   }
 
-  const form = new formidable.IncomingForm();
-  const uploadDir = path.join(process.cwd(), "public", "apk");
-  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-  form.uploadDir = uploadDir;
-  form.keepExtensions = true;
+  const form = new IncomingForm();
 
-  form.parse(req, (err, fields, files) => {
+  form.parse(req, async (err, fields, files) => {
     if (err) {
-      res.status(500).send("Error al procesar el formulario");
-      return;
+      console.error(err);
+      return res.status(500).send("Error al procesar el formulario");
     }
 
-    const apkFile = files.apkFile;
-    if (!apkFile) {
-      res.status(400).send("No se detectó ningún archivo APK");
-      return;
+    try {
+      const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+      const owner = process.env.GITHUB_OWNER;
+      const repo = process.env.GITHUB_REPO;
+      const branch = process.env.GITHUB_BRANCH || "main";
+
+      const apkFile = files.apkFile;
+      if (!apkFile) return res.status(400).send("No se detectó ningún archivo APK");
+
+      // Leer APK como base64
+      const fileBuffer = await fs.promises.readFile(apkFile.filepath);
+      const fileContent = fileBuffer.toString("base64");
+
+      const newName = `app-${Date.now()}.apk`;
+      const apkPath = `public/apk/${newName}`;
+
+      // Subir APK a GitHub
+      await octokit.rest.repos.createOrUpdateFileContents({
+        owner,
+        repo,
+        path: apkPath,
+        message: `Subida nueva versión ${fields.versionName}`,
+        content: fileContent,
+        branch,
+      });
+
+      // Crear version.json
+      const versionData = {
+        versionCode: parseInt(fields.versionCode),
+        versionName: fields.versionName,
+        agregados: fields.agregados,
+        correcciones: fields.correcciones,
+        downloadUrl: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/public/apk/${newName}`
+      };
+
+      const versionContent = Buffer.from(JSON.stringify(versionData, null, 2)).toString("base64");
+
+      await octokit.rest.repos.createOrUpdateFileContents({
+        owner,
+        repo,
+        path: "public/version.json",
+        message: `Actualización versión ${fields.versionName}`,
+        content: versionContent,
+        branch,
+      });
+
+      res.status(200).send("✅ APK subida y version.json actualizado correctamente en GitHub.");
+    } catch (e) {
+      console.error(e);
+      res.status(500).send("❌ Error al subir el APK: " + e.message);
     }
-
-    // Mantener solo 2 APKs: si hay más, borrar el más antiguo
-    const apkFiles = fs.readdirSync(uploadDir)
-        .filter(f => f.endsWith(".apk"))
-        .map(f => ({ name: f, time: fs.statSync(path.join(uploadDir,f)).mtime.getTime() }))
-        .sort((a,b) => a.time - b.time);
-
-    while (apkFiles.length >= 2) {
-      const oldest = apkFiles.shift();
-      fs.unlinkSync(path.join(uploadDir, oldest.name));
-    }
-
-    // Renombrar el APK subido para que no choque
-    const newName = `app-${Date.now()}.apk`;
-    const newPath = path.join(uploadDir, newName);
-    fs.renameSync(apkFile.filepath, newPath);
-
-    // Crear o actualizar version.json
-    const versionData = {
-      versionCode: parseInt(fields.versionCode),
-      versionName: fields.versionName,
-      agregados: fields.agregados,
-      correcciones: fields.correcciones,
-      downloadUrl: `/apk/${newName}`
-    };
-    fs.writeFileSync(path.join(process.cwd(), "public", "version.json"), JSON.stringify(versionData, null, 2));
-
-    res.status(200).send("✅ APK subida y version.json actualizada correctamente");
   });
 }
