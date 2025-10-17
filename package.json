@@ -6,8 +6,8 @@
     "start": "vercel dev"
   },
   "dependencies": {
-    "formidable": "^2.2.3",
-    "octokit": "^2.0.33",
+     "formidable": "^3.1.0",
+  "octokit": "^2.0.0"
     "fs-extra": "^11.1.1"
   }
 }
