@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     return res.status(405).send("Método no permitido");
   }
 
-  const form = new IncomingForm();
+  const form = new IncomingForm({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -30,8 +30,12 @@ export default async function handler(req, res) {
       const apkFile = files.apkFile;
       if (!apkFile) return res.status(400).send("No se detectó ningún archivo APK");
 
+      // Obtener path correcto según la versión de formidable
+      const filePath = apkFile.filepath || apkFile.file?.filepath || apkFile.path;
+      if (!filePath) return res.status(400).send("No se encontró el archivo APK correctamente");
+
       // Leer APK como base64
-      const fileBuffer = await fs.promises.readFile(apkFile.filepath);
+      const fileBuffer = await fs.promises.readFile(filePath);
       const fileContent = fileBuffer.toString("base64");
 
       const newName = `app-${Date.now()}.apk`;
