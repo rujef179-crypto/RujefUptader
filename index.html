@@ -11,7 +11,7 @@
     <input type="file" name="apkFile" accept=".apk" required /><br/><br/>
 
     <label>Version Code:</label>
-    <input type="text" name="versionCode" required /><br/><br/>
+    <input type="number" name="versionCode" required /><br/><br/>
 
     <label>Version Name:</label>
     <input type="text" name="versionName" required /><br/><br/>
@@ -24,5 +24,28 @@
 
     <button type="submit">Subir APK</button>
   </form>
+
+  <div id="resultado" style="margin-top:20px;color:red;"></div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const resultado = document.getElementById('resultado');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultado.textContent = "Subiendo APK...";
+
+      const data = new FormData(form);
+
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: data });
+        const text = await res.text();
+        resultado.style.color = res.ok ? 'green' : 'red';
+        resultado.textContent = text;
+      } catch (err) {
+        resultado.textContent = "Error: " + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
