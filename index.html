@@ -66,12 +66,6 @@
         const resultado = document.getElementById('resultado');
         const submitBtn = document.getElementById('submitBtn');
 
-        const GITHUB_CONFIG = {
-            owner: 'rujef179-crypto',
-            repo: 'RujefUptader',
-            branch: 'main'
-        };
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -90,8 +84,7 @@
             showResult('loading', "Actualizando versión en GitHub...");
 
             try {
-                // Usamos Netlify Function como proxy para obtener el token seguro
-                const response = await fetch('/.netlify/functions/upload', {
+                const response = await fetch('/.netlify/functions/update-version', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
