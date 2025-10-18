@@ -90,7 +90,6 @@
             padding: 10px 15px;
         }
 
-        /* Textareas tipo comentario */
         textarea {
             width: 100%;
             padding: 15px;
@@ -101,10 +100,10 @@
             background: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             resize: vertical;
-            min-height: 250px; /* Más alto por defecto */
-            max-height: 400px; /* Límite de expansión */
+            min-height: 150px; /* Altura fija mínima */
+            max-height: 300px; /* Altura máxima antes del scroll */
             line-height: 1.5;
-            overflow-y: auto; /* Scroll cuando hay mucho texto */
+            overflow-y: auto; /* Scroll vertical cuando sea necesario */
         }
 
         input:focus,
@@ -206,23 +205,23 @@
             color: #e74c3c;
         }
 
-        /* Scroll personalizado para los comentarios */
+        /* Estilos personalizados para el scroll */
         textarea::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
 
         textarea::-webkit-scrollbar-track {
             background: #f1f1f1;
-            border-radius: 5px;
+            border-radius: 4px;
         }
 
         textarea::-webkit-scrollbar-thumb {
-            background: #b5b5b5;
-            border-radius: 5px;
+            background: #c1c1c1;
+            border-radius: 4px;
         }
 
         textarea::-webkit-scrollbar-thumb:hover {
-            background: #999;
+            background: #a8a8a8;
         }
 
         @media (max-width: 600px) {
@@ -240,8 +239,8 @@
             }
             
             textarea {
-                min-height: 200px;
-                max-height: 300px;
+                min-height: 120px;
+                max-height: 200px;
             }
         }
     </style>
@@ -280,27 +279,41 @@
             <div class="form-section">
                 <h3>📝 Notas de la Versión</h3>
                 <div class="form-group">
-                    <label for="agregados">💡 Nuevas Funcionalidades (comentarios largos):</label>
+                    <label for="agregados">Nuevas Funcionalidades:</label>
                     <textarea 
                         id="agregados" 
                         name="agregados" 
                         placeholder="Describe todas las nuevas funcionalidades de esta versión...
-• Nuevo sistema de notificaciones push
-• Modo oscuro completo
-• Mejoras de rendimiento general, etc."
+
+Ejemplos:
+• Nuevo sistema de notificaciones push en tiempo real
+• Implementada función de exportación de reportes en PDF y Excel
+• Agregado modo oscuro completo con ajustes personalizables
+• Mejorada la velocidad de carga y rendimiento general
+• Nueva interfaz de usuario más intuitiva y moderna
+• Funcionalidad de backup automático en la nube
+• Integración con servicios externos y APIs
+• Soporte para múltiples idiomas y localizaciones"
                     ></textarea>
                     <div class="char-count" id="agregadosCount">0/2000 caracteres</div>
                 </div>
 
                 <div class="form-group">
-                    <label for="correcciones">🛠️ Correcciones y Mejoras (comentarios largos):</label>
+                    <label for="correcciones">Correcciones y Mejoras:</label>
                     <textarea 
                         id="correcciones" 
                         name="correcciones" 
                         placeholder="Lista todas las correcciones y mejoras implementadas...
-• Corregido crash en pantalla de login
-• Mejorado manejo de memoria
-• Estabilidad general optimizada, etc."
+
+Ejemplos:
+• Corregido crash crítico en la pantalla de login con usuarios específicos
+• Solucionado problema de sincronización de datos en segundo plano
+• Arreglado error al guardar configuraciones personalizadas
+• Mejorado el manejo de memoria y reducido el consumo de RAM
+• Corregido bug en la generación de reportes con fechas específicas
+• Solucionado problema de conexión con servidores lentos
+• Arreglado error en la visualización de imágenes en dispositivos antiguos
+• Mejorada la estabilidad general y experiencia del usuario"
                     ></textarea>
                     <div class="char-count" id="correccionesCount">0/2000 caracteres</div>
                 </div>
@@ -323,7 +336,7 @@
         const agregadosCount = document.getElementById('agregadosCount');
         const correccionesCount = document.getElementById('correccionesCount');
 
-        // Contador de caracteres
+        // Contador de caracteres para los textareas
         function setupCharCounter(textarea, counterElement, maxChars = 2000) {
             function updateCounter() {
                 const length = textarea.value.length;
@@ -343,15 +356,17 @@
             }
             
             textarea.addEventListener('input', updateCounter);
-            updateCounter();
+            updateCounter(); // Inicializar
         }
 
+        // Configurar contadores
         setupCharCounter(agregadosTextarea, agregadosCount);
         setupCharCounter(correccionesTextarea, correccionesCount);
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Mostrar estado de carga
             submitBtn.disabled = true;
             submitBtn.textContent = '📤 Subiendo...';
             resultado.className = 'resultado loading';
@@ -371,8 +386,9 @@
                 if (res.ok) {
                     resultado.className = 'resultado success';
                     resultado.textContent = text;
-                    form.reset();
+                    form.reset(); // Limpiar formulario después de éxito
                     
+                    // Resetear contadores
                     agregadosCount.textContent = "0/2000 caracteres";
                     correccionesCount.textContent = "0/2000 caracteres";
                     agregadosCount.classList.remove('warning');
@@ -390,7 +406,7 @@
             }
         });
 
-        // Efecto visual para archivo seleccionado
+        // Efecto visual para el archivo seleccionado
         document.getElementById('apkFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
