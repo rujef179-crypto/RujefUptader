@@ -1,421 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rujef - Subir APK</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 100%;
-            max-width: 500px;
-            margin-top: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        input[type="file"],
-        input[type="number"],
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        input[type="file"] {
-            padding: 10px 15px;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            resize: vertical;
-            min-height: 150px; /* Altura fija mínima */
-            max-height: 300px; /* Altura máxima antes del scroll */
-            line-height: 1.5;
-            overflow-y: auto; /* Scroll vertical cuando sea necesario */
-        }
-
-        input:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn-submit {
-            width: 100%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-submit:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .resultado {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 500;
-            display: none;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-
-        .loading {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-            display: block;
-        }
-
-        .file-info {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .form-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-
-        .form-section h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .char-count {
-            font-size: 12px;
-            color: #666;
-            text-align: right;
-            margin-top: 5px;
-        }
-
-        .char-count.warning {
-            color: #e74c3c;
-        }
-
-        /* Estilos personalizados para el scroll */
-        textarea::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        textarea::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        textarea::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        textarea::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px;
-                margin-top: 20px;
-            }
-            
-            body {
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-            
-            textarea {
-                min-height: 120px;
-                max-height: 200px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Subir APK</title>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">R</div>
-            <h1>Subir APK</h1>
-            <p class="subtitle">Actualiza tu aplicación Rujef</p>
-        </div>
+  <h1>Subir APK</h1>
+  <form id="uploadForm" enctype="multipart/form-data" method="POST" action="/api/upload">
+    <label>APK:</label>
+    <input type="file" name="apkFile" accept=".apk" required /><br/><br/>
 
-        <form id="uploadForm" enctype="multipart/form-data" method="POST" action="/api/upload">
-            <div class="form-section">
-                <h3>📱 Archivo APK</h3>
-                <div class="form-group">
-                    <label for="apkFile">Seleccionar APK:</label>
-                    <input type="file" id="apkFile" name="apkFile" accept=".apk" required />
-                    <div class="file-info">Formatos aceptados: .apk</div>
-                </div>
-            </div>
+    <label>Version Code:</label>
+    <input type="number" name="versionCode" required /><br/><br/>
 
-            <div class="form-section">
-                <h3>📋 Información de Versión</h3>
-                <div class="form-group">
-                    <label for="versionCode">Version Code:</label>
-                    <input type="number" id="versionCode" name="versionCode" placeholder="Ej: 2" required />
-                </div>
+    <label>Version Name:</label>
+    <input type="text" name="versionName" required /><br/><br/>
 
-                <div class="form-group">
-                    <label for="versionName">Version Name:</label>
-                    <input type="text" id="versionName" name="versionName" placeholder="Ej: 1.1.0" required />
-                </div>
-            </div>
+    <label>Agregados:</label>
+    <input type="text" name="agregados" /><br/><br/>
 
-            <div class="form-section">
-                <h3>📝 Notas de la Versión</h3>
-                <div class="form-group">
-                    <label for="agregados">Nuevas Funcionalidades:</label>
-                    <textarea 
-                        id="agregados" 
-                        name="agregados" 
-                        placeholder="Describe todas las nuevas funcionalidades de esta versión...
+    <label>Correcciones:</label>
+    <input type="text" name="correcciones" /><br/><br/>
 
-Ejemplos:
-• Nuevo sistema de notificaciones push en tiempo real
-• Implementada función de exportación de reportes en PDF y Excel
-• Agregado modo oscuro completo con ajustes personalizables
-• Mejorada la velocidad de carga y rendimiento general
-• Nueva interfaz de usuario más intuitiva y moderna
-• Funcionalidad de backup automático en la nube
-• Integración con servicios externos y APIs
-• Soporte para múltiples idiomas y localizaciones"
-                    ></textarea>
-                    <div class="char-count" id="agregadosCount">0/2000 caracteres</div>
-                </div>
+    <button type="submit">Subir APK</button>
+  </form>
 
-                <div class="form-group">
-                    <label for="correcciones">Correcciones y Mejoras:</label>
-                    <textarea 
-                        id="correcciones" 
-                        name="correcciones" 
-                        placeholder="Lista todas las correcciones y mejoras implementadas...
+  <div id="resultado" style="margin-top:20px;color:red;"></div>
 
-Ejemplos:
-• Corregido crash crítico en la pantalla de login con usuarios específicos
-• Solucionado problema de sincronización de datos en segundo plano
-• Arreglado error al guardar configuraciones personalizadas
-• Mejorado el manejo de memoria y reducido el consumo de RAM
-• Corregido bug en la generación de reportes con fechas específicas
-• Solucionado problema de conexión con servidores lentos
-• Arreglado error en la visualización de imágenes en dispositivos antiguos
-• Mejorada la estabilidad general y experiencia del usuario"
-                    ></textarea>
-                    <div class="char-count" id="correccionesCount">0/2000 caracteres</div>
-                </div>
-            </div>
+  <script>
+    const form = document.getElementById('uploadForm');
+    const resultado = document.getElementById('resultado');
 
-            <button type="submit" class="btn-submit" id="submitBtn">
-                🚀 Subir APK
-            </button>
-        </form>
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultado.textContent = "Subiendo APK...";
 
-        <div id="resultado" class="resultado"></div>
-    </div>
+      const data = new FormData(form);
 
-    <script>
-        const form = document.getElementById('uploadForm');
-        const resultado = document.getElementById('resultado');
-        const submitBtn = document.getElementById('submitBtn');
-        const agregadosTextarea = document.getElementById('agregados');
-        const correccionesTextarea = document.getElementById('correcciones');
-        const agregadosCount = document.getElementById('agregadosCount');
-        const correccionesCount = document.getElementById('correccionesCount');
-
-        // Contador de caracteres para los textareas
-        function setupCharCounter(textarea, counterElement, maxChars = 2000) {
-            function updateCounter() {
-                const length = textarea.value.length;
-                counterElement.textContent = `${length}/${maxChars} caracteres`;
-                
-                if (length > maxChars * 0.9) {
-                    counterElement.classList.add('warning');
-                } else {
-                    counterElement.classList.remove('warning');
-                }
-                
-                if (length > maxChars) {
-                    textarea.style.borderColor = '#e74c3c';
-                } else {
-                    textarea.style.borderColor = '';
-                }
-            }
-            
-            textarea.addEventListener('input', updateCounter);
-            updateCounter(); // Inicializar
-        }
-
-        // Configurar contadores
-        setupCharCounter(agregadosTextarea, agregadosCount);
-        setupCharCounter(correccionesTextarea, correccionesCount);
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // Mostrar estado de carga
-            submitBtn.disabled = true;
-            submitBtn.textContent = '📤 Subiendo...';
-            resultado.className = 'resultado loading';
-            resultado.textContent = "Subiendo APK a GitHub...";
-            resultado.style.display = 'block';
-
-            const data = new FormData(form);
-
-            try {
-                const res = await fetch('/api/upload', { 
-                    method: 'POST', 
-                    body: data 
-                });
-                
-                const text = await res.text();
-                
-                if (res.ok) {
-                    resultado.className = 'resultado success';
-                    resultado.textContent = text;
-                    form.reset(); // Limpiar formulario después de éxito
-                    
-                    // Resetear contadores
-                    agregadosCount.textContent = "0/2000 caracteres";
-                    correccionesCount.textContent = "0/2000 caracteres";
-                    agregadosCount.classList.remove('warning');
-                    correccionesCount.classList.remove('warning');
-                } else {
-                    resultado.className = 'resultado error';
-                    resultado.textContent = text;
-                }
-            } catch (err) {
-                resultado.className = 'resultado error';
-                resultado.textContent = "Error de conexión: " + err.message;
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Subir APK';
-            }
-        });
-
-        // Efecto visual para el archivo seleccionado
-        document.getElementById('apkFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const fileInfo = this.nextElementSibling;
-                fileInfo.textContent = `Archivo seleccionado: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                fileInfo.style.color = '#667eea';
-                fileInfo.style.fontWeight = '500';
-            }
-        });
-    </script>
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: data });
+        const text = await res.text();
+        resultado.style.color = res.ok ? 'green' : 'red';
+        resultado.textContent = text;
+      } catch (err) {
+        resultado.textContent = "Error: " + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
