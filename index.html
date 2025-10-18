@@ -20,6 +20,9 @@
         .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
         .loading { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; display: block; }
         .info-section { background: #d1ecf1; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .file-info { font-size: 12px; color: #666; margin-top: 5px; }
+        .form-section { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .form-section h3 { color: #333; margin-bottom: 15px; font-size: 16px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -38,24 +41,40 @@
         </div>
 
         <form id="uploadForm">
-            <div class="form-group">
-                <label>Version Code:</label>
-                <input type="number" id="versionCode" required />
-            </div>
-            <div class="form-group">
-                <label>Version Name:</label>
-                <input type="text" id="versionName" required />
-            </div>
-            <div class="form-group">
-                <label>Nuevas Funcionalidades:</label>
-                <input type="text" id="agregados" placeholder="¿Qué hay de nuevo?" />
-            </div>
-            <div class="form-group">
-                <label>Correcciones:</label>
-                <input type="text" id="correcciones" placeholder="¿Qué se arregló?" />
+            <div class="form-section">
+                <h3>📱 Archivo APK</h3>
+                <div class="form-group">
+                    <label for="apkFile">Seleccionar APK:</label>
+                    <input type="file" id="apkFile" accept=".apk" />
+                    <div class="file-info">Formatos aceptados: .apk (opcional)</div>
+                </div>
             </div>
 
-            <button type="submit" class="btn-submit" id="submitBtn">🚀 Actualizar Versión</button>
+            <div class="form-section">
+                <h3>📋 Información de Versión</h3>
+                <div class="form-group">
+                    <label for="versionCode">Version Code:</label>
+                    <input type="number" id="versionCode" required />
+                </div>
+                <div class="form-group">
+                    <label for="versionName">Version Name:</label>
+                    <input type="text" id="versionName" required />
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>📝 Notas de la Versión</h3>
+                <div class="form-group">
+                    <label for="agregados">Nuevas Funcionalidades:</label>
+                    <input type="text" id="agregados" placeholder="¿Qué hay de nuevo?" />
+                </div>
+                <div class="form-group">
+                    <label for="correcciones">Correcciones:</label>
+                    <input type="text" id="correcciones" placeholder="¿Qué se arregló?" />
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">🚀 Subir APK y Actualizar</button>
         </form>
 
         <div id="resultado" class="resultado"></div>
@@ -65,6 +84,7 @@
         const form = document.getElementById('uploadForm');
         const resultado = document.getElementById('resultado');
         const submitBtn = document.getElementById('submitBtn');
+        const apkFileInput = document.getElementById('apkFile');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -73,6 +93,7 @@
             const versionName = document.getElementById('versionName').value;
             const agregados = document.getElementById('agregados').value;
             const correcciones = document.getElementById('correcciones').value;
+            const apkFile = apkFileInput.files[0];
 
             if (!versionCode || !versionName) {
                 showResult('error', '❌ Completa Version Code y Version Name');
@@ -80,21 +101,36 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = '📤 Actualizando...';
-            showResult('loading', "Actualizando versión en GitHub...");
+            submitBtn.textContent = '📤 Subiendo...';
+            showResult('loading', "Subiendo APK y actualizando versión...");
 
             try {
-                const response = await fetch('/.netlify/functions/update-version', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
+                // Si hay archivo APK, usar FormData, sino JSON
+                let requestData;
+                let headers = {};
+                
+                if (apkFile) {
+                    requestData = new FormData();
+                    requestData.append('apkFile', apkFile);
+                    requestData.append('versionCode', versionCode);
+                    requestData.append('versionName', versionName);
+                    requestData.append('agregados', agregados);
+                    requestData.append('correcciones', correcciones);
+                } else {
+                    requestData = JSON.stringify({
                         versionCode: parseInt(versionCode),
                         versionName: versionName,
                         agregados: agregados || "",
-                        correcciones: correcciones || ""
-                    })
+                        correcciones: correcciones || "",
+                        apkFile: null
+                    });
+                    headers['Content-Type'] = 'application/json';
+                }
+
+                const response = await fetch('/.netlify/functions/update-version', {
+                    method: 'POST',
+                    headers: headers,
+                    body: requestData
                 });
 
                 const data = await response.json();
@@ -111,7 +147,23 @@
                 showResult('error', '❌ Error: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Actualizar Versión';
+                submitBtn.textContent = '🚀 Subir APK y Actualizar';
+            }
+        });
+
+        // Mostrar información del archivo seleccionado
+        apkFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const fileInfo = this.nextElementSibling;
+            if (file) {
+                const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+                fileInfo.textContent = `Archivo seleccionado: ${file.name} (${fileSizeMB} MB)`;
+                fileInfo.style.color = '#28a745';
+                fileInfo.style.fontWeight = '500';
+            } else {
+                fileInfo.textContent = 'Formatos aceptados: .apk (opcional)';
+                fileInfo.style.color = '#666';
+                fileInfo.style.fontWeight = 'normal';
             }
         });
 
