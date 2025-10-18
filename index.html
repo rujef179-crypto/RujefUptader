@@ -92,7 +92,7 @@
 
         textarea {
             width: 100%;
-            padding: 12px 15px;
+            padding: 15px;
             border: 2px solid #e1e5e9;
             border-radius: 10px;
             font-size: 14px;
@@ -100,8 +100,8 @@
             background: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             resize: vertical;
-            min-height: 80px;
-            line-height: 1.4;
+            min-height: 120px; /* Más alto que antes */
+            line-height: 1.5;
         }
 
         input:focus,
@@ -218,19 +218,8 @@
             }
             
             textarea {
-                min-height: 70px;
+                min-height: 100px; /* Un poco menos en móvil pero aún grande */
             }
-        }
-
-        .upload-icon {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .upload-icon i {
-            font-size: 48px;
-            color: #667eea;
-            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -272,9 +261,13 @@
                     <textarea 
                         id="agregados" 
                         name="agregados" 
-                        placeholder="Describe las nuevas funcionalidades de esta versión...&#10;Ej:&#10;- Nuevo sistema de notificaciones&#10;- Mejora en la interfaz de usuario&#10;- Funcionalidad de exportación de datos"
+                        placeholder="Ejemplo:
+- Nuevo sistema de notificaciones push
+- Implementada función de exportación de reportes
+- Agregado modo oscuro
+- Mejorada la velocidad de carga"
                     ></textarea>
-                    <div class="char-count" id="agregadosCount">0/500 caracteres</div>
+                    <div class="char-count" id="agregadosCount">0/1000 caracteres</div>
                 </div>
 
                 <div class="form-group">
@@ -282,9 +275,13 @@
                     <textarea 
                         id="correcciones" 
                         name="correcciones" 
-                        placeholder="Lista las correcciones y mejoras implementadas...&#10;Ej:&#10;- Arreglado crash en pantalla de login&#10;- Mejorado el rendimiento general&#10;- Corregido error de sincronización"
+                        placeholder="Ejemplo:
+- Corregido crash en pantalla de login
+- Solucionado problema de sincronización
+- Arreglado error al guardar configuraciones
+- Mejorado el manejo de memoria"
                     ></textarea>
-                    <div class="char-count" id="correccionesCount">0/500 caracteres</div>
+                    <div class="char-count" id="correccionesCount">0/1000 caracteres</div>
                 </div>
             </div>
 
@@ -306,7 +303,7 @@
         const correccionesCount = document.getElementById('correccionesCount');
 
         // Contador de caracteres para los textareas
-        function setupCharCounter(textarea, counterElement, maxChars = 500) {
+        function setupCharCounter(textarea, counterElement, maxChars = 1000) {
             function updateCounter() {
                 const length = textarea.value.length;
                 counterElement.textContent = `${length}/${maxChars} caracteres`;
@@ -358,8 +355,8 @@
                     form.reset(); // Limpiar formulario después de éxito
                     
                     // Resetear contadores
-                    agregadosCount.textContent = "0/500 caracteres";
-                    correccionesCount.textContent = "0/500 caracteres";
+                    agregadosCount.textContent = "0/1000 caracteres";
+                    correccionesCount.textContent = "0/1000 caracteres";
                     agregadosCount.classList.remove('warning');
                     correccionesCount.classList.remove('warning');
                 } else {
