@@ -90,7 +90,22 @@
             padding: 10px 15px;
         }
 
-        input:focus {
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.4;
+        }
+
+        input:focus,
+        textarea:focus {
             outline: none;
             border-color: #667eea;
             background: white;
@@ -177,6 +192,17 @@
             font-weight: 600;
         }
 
+        .char-count {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .char-count.warning {
+            color: #e74c3c;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 25px;
@@ -189,6 +215,10 @@
             
             h1 {
                 font-size: 24px;
+            }
+            
+            textarea {
+                min-height: 70px;
             }
         }
 
@@ -239,12 +269,22 @@
                 <h3>📝 Notas de la Versión</h3>
                 <div class="form-group">
                     <label for="agregados">Nuevas Funcionalidades:</label>
-                    <input type="text" id="agregados" name="agregados" placeholder="Ej: Nuevo sistema de notificaciones" />
+                    <textarea 
+                        id="agregados" 
+                        name="agregados" 
+                        placeholder="Describe las nuevas funcionalidades de esta versión...&#10;Ej:&#10;- Nuevo sistema de notificaciones&#10;- Mejora en la interfaz de usuario&#10;- Funcionalidad de exportación de datos"
+                    ></textarea>
+                    <div class="char-count" id="agregadosCount">0/500 caracteres</div>
                 </div>
 
                 <div class="form-group">
                     <label for="correcciones">Correcciones:</label>
-                    <input type="text" id="correcciones" name="correcciones" placeholder="Ej: Arreglado crash en login" />
+                    <textarea 
+                        id="correcciones" 
+                        name="correcciones" 
+                        placeholder="Lista las correcciones y mejoras implementadas...&#10;Ej:&#10;- Arreglado crash en pantalla de login&#10;- Mejorado el rendimiento general&#10;- Corregido error de sincronización"
+                    ></textarea>
+                    <div class="char-count" id="correccionesCount">0/500 caracteres</div>
                 </div>
             </div>
 
@@ -260,6 +300,37 @@
         const form = document.getElementById('uploadForm');
         const resultado = document.getElementById('resultado');
         const submitBtn = document.getElementById('submitBtn');
+        const agregadosTextarea = document.getElementById('agregados');
+        const correccionesTextarea = document.getElementById('correcciones');
+        const agregadosCount = document.getElementById('agregadosCount');
+        const correccionesCount = document.getElementById('correccionesCount');
+
+        // Contador de caracteres para los textareas
+        function setupCharCounter(textarea, counterElement, maxChars = 500) {
+            function updateCounter() {
+                const length = textarea.value.length;
+                counterElement.textContent = `${length}/${maxChars} caracteres`;
+                
+                if (length > maxChars * 0.9) {
+                    counterElement.classList.add('warning');
+                } else {
+                    counterElement.classList.remove('warning');
+                }
+                
+                if (length > maxChars) {
+                    textarea.style.borderColor = '#e74c3c';
+                } else {
+                    textarea.style.borderColor = '';
+                }
+            }
+            
+            textarea.addEventListener('input', updateCounter);
+            updateCounter(); // Inicializar
+        }
+
+        // Configurar contadores
+        setupCharCounter(agregadosTextarea, agregadosCount);
+        setupCharCounter(correccionesTextarea, correccionesCount);
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -285,6 +356,12 @@
                     resultado.className = 'resultado success';
                     resultado.textContent = text;
                     form.reset(); // Limpiar formulario después de éxito
+                    
+                    // Resetear contadores
+                    agregadosCount.textContent = "0/500 caracteres";
+                    correccionesCount.textContent = "0/500 caracteres";
+                    agregadosCount.classList.remove('warning');
+                    correccionesCount.classList.remove('warning');
                 } else {
                     resultado.className = 'resultado error';
                     resultado.textContent = text;
