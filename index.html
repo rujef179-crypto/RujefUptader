@@ -100,8 +100,10 @@
             background: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             resize: vertical;
-            min-height: 120px; /* Más alto que antes */
+            min-height: 150px; /* Altura fija mínima */
+            max-height: 300px; /* Altura máxima antes del scroll */
             line-height: 1.5;
+            overflow-y: auto; /* Scroll vertical cuando sea necesario */
         }
 
         input:focus,
@@ -203,6 +205,25 @@
             color: #e74c3c;
         }
 
+        /* Estilos personalizados para el scroll */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 25px;
@@ -218,7 +239,8 @@
             }
             
             textarea {
-                min-height: 100px; /* Un poco menos en móvil pero aún grande */
+                min-height: 120px;
+                max-height: 200px;
             }
         }
     </style>
@@ -261,27 +283,39 @@
                     <textarea 
                         id="agregados" 
                         name="agregados" 
-                        placeholder="Ejemplo:
-- Nuevo sistema de notificaciones push
-- Implementada función de exportación de reportes
-- Agregado modo oscuro
-- Mejorada la velocidad de carga"
+                        placeholder="Describe todas las nuevas funcionalidades de esta versión...
+
+Ejemplos:
+• Nuevo sistema de notificaciones push en tiempo real
+• Implementada función de exportación de reportes en PDF y Excel
+• Agregado modo oscuro completo con ajustes personalizables
+• Mejorada la velocidad de carga y rendimiento general
+• Nueva interfaz de usuario más intuitiva y moderna
+• Funcionalidad de backup automático en la nube
+• Integración con servicios externos y APIs
+• Soporte para múltiples idiomas y localizaciones"
                     ></textarea>
-                    <div class="char-count" id="agregadosCount">0/1000 caracteres</div>
+                    <div class="char-count" id="agregadosCount">0/2000 caracteres</div>
                 </div>
 
                 <div class="form-group">
-                    <label for="correcciones">Correcciones:</label>
+                    <label for="correcciones">Correcciones y Mejoras:</label>
                     <textarea 
                         id="correcciones" 
                         name="correcciones" 
-                        placeholder="Ejemplo:
-- Corregido crash en pantalla de login
-- Solucionado problema de sincronización
-- Arreglado error al guardar configuraciones
-- Mejorado el manejo de memoria"
+                        placeholder="Lista todas las correcciones y mejoras implementadas...
+
+Ejemplos:
+• Corregido crash crítico en la pantalla de login con usuarios específicos
+• Solucionado problema de sincronización de datos en segundo plano
+• Arreglado error al guardar configuraciones personalizadas
+• Mejorado el manejo de memoria y reducido el consumo de RAM
+• Corregido bug en la generación de reportes con fechas específicas
+• Solucionado problema de conexión con servidores lentos
+• Arreglado error en la visualización de imágenes en dispositivos antiguos
+• Mejorada la estabilidad general y experiencia del usuario"
                     ></textarea>
-                    <div class="char-count" id="correccionesCount">0/1000 caracteres</div>
+                    <div class="char-count" id="correccionesCount">0/2000 caracteres</div>
                 </div>
             </div>
 
@@ -303,7 +337,7 @@
         const correccionesCount = document.getElementById('correccionesCount');
 
         // Contador de caracteres para los textareas
-        function setupCharCounter(textarea, counterElement, maxChars = 1000) {
+        function setupCharCounter(textarea, counterElement, maxChars = 2000) {
             function updateCounter() {
                 const length = textarea.value.length;
                 counterElement.textContent = `${length}/${maxChars} caracteres`;
@@ -355,8 +389,8 @@
                     form.reset(); // Limpiar formulario después de éxito
                     
                     // Resetear contadores
-                    agregadosCount.textContent = "0/1000 caracteres";
-                    correccionesCount.textContent = "0/1000 caracteres";
+                    agregadosCount.textContent = "0/2000 caracteres";
+                    correccionesCount.textContent = "0/2000 caracteres";
                     agregadosCount.classList.remove('warning');
                     correccionesCount.classList.remove('warning');
                 } else {
