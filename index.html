@@ -19,6 +19,7 @@
         .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
         .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
         .loading { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; display: block; }
+        .token-section { background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -29,12 +30,15 @@
             <p style="color: #666; font-size: 14px;">Actualiza tu aplicación Rujef</p>
         </div>
 
-        <form id="uploadForm">
+        <div class="token-section">
             <div class="form-group">
-                <label>APK:</label>
-                <input type="file" id="apkFile" accept=".apk" />
-                <small style="color: #666;">Opcional por ahora</small>
+                <label>Token de GitHub:</label>
+                <input type="password" id="githubToken" placeholder="Pega tu token de GitHub aquí" />
+                <small style="color: #666;">Necesitas un token con permisos "repo"</small>
             </div>
+        </div>
+
+        <form id="uploadForm">
             <div class="form-group">
                 <label>Version Code:</label>
                 <input type="number" id="versionCode" required />
@@ -45,11 +49,11 @@
             </div>
             <div class="form-group">
                 <label>Nuevas Funcionalidades:</label>
-                <input type="text" id="agregados" />
+                <input type="text" id="agregados" placeholder="¿Qué hay de nuevo?" />
             </div>
             <div class="form-group">
                 <label>Correcciones:</label>
-                <input type="text" id="correcciones" />
+                <input type="text" id="correcciones" placeholder="¿Qué se arregló?" />
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">🚀 Actualizar Versión</button>
@@ -62,41 +66,81 @@
         const form = document.getElementById('uploadForm');
         const resultado = document.getElementById('resultado');
         const submitBtn = document.getElementById('submitBtn');
+        const tokenInput = document.getElementById('githubToken');
+
+        // Configuración de GitHub
+        const GITHUB_CONFIG = {
+            owner: 'rujef179-crypto',
+            repo: 'RujefUptader',
+            branch: 'main'
+        };
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const formData = new FormData();
-            const apkFile = document.getElementById('apkFile').files[0];
-            
-            if (apkFile) {
-                formData.append('apkFile', apkFile);
+            const token = tokenInput.value.trim();
+            if (!token) {
+                showResult('error', '❌ Ingresa tu token de GitHub');
+                return;
             }
-            formData.append('versionCode', document.getElementById('versionCode').value);
-            formData.append('versionName', document.getElementById('versionName').value);
-            formData.append('agregados', document.getElementById('agregados').value);
-            formData.append('correcciones', document.getElementById('correcciones').value);
+
+            const versionCode = document.getElementById('versionCode').value;
+            const versionName = document.getElementById('versionName').value;
+            const agregados = document.getElementById('agregados').value;
+            const correcciones = document.getElementById('correcciones').value;
+
+            if (!versionCode || !versionName) {
+                showResult('error', '❌ Completa Version Code y Version Name');
+                return;
+            }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = '📤 Subiendo...';
+            submitBtn.textContent = '📤 Actualizando...';
             showResult('loading', "Actualizando versión en GitHub...");
 
             try {
-                const response = await fetch('/.netlify/functions/upload', {
-                    method: 'POST',
-                    body: formData
-                });
+                // Crear version.json
+                const versionData = {
+                    versionCode: parseInt(versionCode),
+                    versionName: versionName,
+                    agregados: agregados || "",
+                    correcciones: correcciones || "",
+                    downloadUrl: `https://github.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/releases/latest`,
+                    timestamp: new Date().toISOString()
+                };
+
+                const versionContent = btoa(JSON.stringify(versionData, null, 2));
+
+                // Subir a GitHub
+                const response = await fetch(
+                    `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/public/version.json`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/vnd.github.v3+json'
+                        },
+                        body: JSON.stringify({
+                            message: `Actualización versión ${versionName} (v${versionCode})`,
+                            content: versionContent,
+                            branch: GITHUB_CONFIG.branch
+                        })
+                    }
+                );
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    showResult('success', data.message);
+                    showResult('success', '✅ version.json actualizado correctamente en GitHub');
                     form.reset();
                 } else {
-                    showResult('error', data.error);
+                    throw new Error(data.message || `Error ${response.status}`);
                 }
+
             } catch (error) {
-                showResult('error', 'Error de conexión: ' + error.message);
+                console.error('Error:', error);
+                showResult('error', '❌ Error: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '🚀 Actualizar Versión';
@@ -107,6 +151,17 @@
             resultado.className = `resultado ${type}`;
             resultado.textContent = message;
             resultado.style.display = 'block';
+        }
+
+        // Guardar token en localStorage para futuras sesiones
+        tokenInput.addEventListener('input', (e) => {
+            localStorage.setItem('githubToken', e.target.value);
+        });
+
+        // Cargar token guardado
+        const savedToken = localStorage.getItem('githubToken');
+        if (savedToken) {
+            tokenInput.value = savedToken;
         }
     </script>
 </body>
