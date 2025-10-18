@@ -26,13 +26,14 @@
         <div class="header">
             <div class="logo">R</div>
             <h1>Subir APK</h1>
-            <p class="subtitle">Actualiza tu aplicación Rujef</p>
+            <p style="color: #666; font-size: 14px;">Actualiza tu aplicación Rujef</p>
         </div>
 
         <form id="uploadForm">
             <div class="form-group">
                 <label>APK:</label>
-                <input type="file" id="apkFile" accept=".apk" required />
+                <input type="file" id="apkFile" accept=".apk" />
+                <small style="color: #666;">Opcional por ahora</small>
             </div>
             <div class="form-group">
                 <label>Version Code:</label>
@@ -51,7 +52,7 @@
                 <input type="text" id="correcciones" />
             </div>
 
-            <button type="submit" class="btn-submit" id="submitBtn">🚀 Subir APK</button>
+            <button type="submit" class="btn-submit" id="submitBtn">🚀 Actualizar Versión</button>
         </form>
 
         <div id="resultado" class="resultado"></div>
@@ -65,9 +66,12 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const apkFile = document.getElementById('apkFile').files[0];
             const formData = new FormData();
-            formData.append('apkFile', apkFile);
+            const apkFile = document.getElementById('apkFile').files[0];
+            
+            if (apkFile) {
+                formData.append('apkFile', apkFile);
+            }
             formData.append('versionCode', document.getElementById('versionCode').value);
             formData.append('versionName', document.getElementById('versionName').value);
             formData.append('agregados', document.getElementById('agregados').value);
@@ -75,7 +79,7 @@
 
             submitBtn.disabled = true;
             submitBtn.textContent = '📤 Subiendo...';
-            showResult('loading', "Subiendo APK...");
+            showResult('loading', "Actualizando versión en GitHub...");
 
             try {
                 const response = await fetch('/.netlify/functions/upload', {
@@ -95,7 +99,7 @@
                 showResult('error', 'Error de conexión: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Subir APK';
+                submitBtn.textContent = '🚀 Actualizar Versión';
             }
         });
 
