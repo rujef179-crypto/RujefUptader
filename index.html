@@ -5,156 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subir APK - Rujef</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 100%;
-            max-width: 500px;
-            margin-top: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        input[type="file"],
-        input[type="number"],
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn-submit {
-            width: 100%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .resultado {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 500;
-            display: none;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-
-        .loading {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-            display: block;
-        }
-
-        .form-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-
-        .form-section h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 16px;
-            font-weight: 600;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); padding: 40px; width: 100%; max-width: 500px; margin-top: 40px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; }
+        h1 { color: #333; font-size: 28px; font-weight: 600; margin-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
+        input, button { width: 100%; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 14px; margin-bottom: 10px; }
+        .btn-submit { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .resultado { margin-top: 25px; padding: 15px; border-radius: 10px; text-align: center; font-weight: 500; display: none; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
+        .loading { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; display: block; }
     </style>
 </head>
 <body>
@@ -166,43 +30,28 @@
         </div>
 
         <form id="uploadForm">
-            <div class="form-section">
-                <h3>📱 Archivo APK</h3>
-                <div class="form-group">
-                    <label for="apkFile">Seleccionar APK:</label>
-                    <input type="file" id="apkFile" accept=".apk" required />
-                </div>
+            <div class="form-group">
+                <label>APK:</label>
+                <input type="file" id="apkFile" accept=".apk" required />
+            </div>
+            <div class="form-group">
+                <label>Version Code:</label>
+                <input type="number" id="versionCode" required />
+            </div>
+            <div class="form-group">
+                <label>Version Name:</label>
+                <input type="text" id="versionName" required />
+            </div>
+            <div class="form-group">
+                <label>Nuevas Funcionalidades:</label>
+                <input type="text" id="agregados" />
+            </div>
+            <div class="form-group">
+                <label>Correcciones:</label>
+                <input type="text" id="correcciones" />
             </div>
 
-            <div class="form-section">
-                <h3>📋 Información de Versión</h3>
-                <div class="form-group">
-                    <label for="versionCode">Version Code:</label>
-                    <input type="number" id="versionCode" placeholder="Ej: 2" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="versionName">Version Name:</label>
-                    <input type="text" id="versionName" placeholder="Ej: 1.1.0" required />
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h3>📝 Notas de la Versión</h3>
-                <div class="form-group">
-                    <label for="agregados">Nuevas Funcionalidades:</label>
-                    <input type="text" id="agregados" placeholder="Ej: Nuevo sistema de notificaciones" />
-                </div>
-
-                <div class="form-group">
-                    <label for="correcciones">Correcciones:</label>
-                    <input type="text" id="correcciones" placeholder="Ej: Arreglado crash en login" />
-                </div>
-            </div>
-
-            <button type="submit" class="btn-submit" id="submitBtn">
-                🚀 Subir APK a GitHub
-            </button>
+            <button type="submit" class="btn-submit" id="submitBtn">🚀 Subir APK</button>
         </form>
 
         <div id="resultado" class="resultado"></div>
@@ -213,125 +62,47 @@
         const resultado = document.getElementById('resultado');
         const submitBtn = document.getElementById('submitBtn');
 
-        // ⚠️ CONFIGURACIÓN - REEMPLAZA CON TUS DATOS
-        const GITHUB_CONFIG = {
-            owner: 'rujef179-crypto',
-            repo: 'RujefUptader',
-            branch: 'main',
-            token: 'TU_TOKEN_DE_GITHUB_AQUI' // ⚠️ REEMPLAZA ESTO
-        };
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (!GITHUB_CONFIG.token || GITHUB_CONFIG.token === 'TU_TOKEN_DE_GITHUB_AQUI') {
-                showResult('error', '❌ Configura tu token de GitHub primero');
-                return;
-            }
-
-            // Validar campos
             const apkFile = document.getElementById('apkFile').files[0];
-            const versionCode = document.getElementById('versionCode').value;
-            const versionName = document.getElementById('versionName').value;
-            const agregados = document.getElementById('agregados').value;
-            const correcciones = document.getElementById('correcciones').value;
+            const formData = new FormData();
+            formData.append('apkFile', apkFile);
+            formData.append('versionCode', document.getElementById('versionCode').value);
+            formData.append('versionName', document.getElementById('versionName').value);
+            formData.append('agregados', document.getElementById('agregados').value);
+            formData.append('correcciones', document.getElementById('correcciones').value);
 
-            if (!apkFile || !versionCode || !versionName) {
-                showResult('error', '❌ Completa todos los campos requeridos');
-                return;
-            }
-
-            // Mostrar estado de carga
             submitBtn.disabled = true;
             submitBtn.textContent = '📤 Subiendo...';
-            showResult('loading', "Subiendo APK directamente a GitHub...");
+            showResult('loading', "Subiendo APK...");
 
             try {
-                // Leer archivo APK
-                const fileContent = await readFileAsBase64(apkFile);
-                const fileName = `app-${versionName}-${Date.now()}.apk`;
-                const apkPath = `public/apk/${fileName}`;
+                const response = await fetch('/.netlify/functions/upload', {
+                    method: 'POST',
+                    body: formData
+                });
 
-                // 1. Subir APK a GitHub
-                await uploadToGitHub(apkPath, fileContent, 
-                    `Subida nueva versión ${versionName} (v${versionCode})`);
+                const data = await response.json();
 
-                // 2. Crear/actualizar version.json
-                const versionData = {
-                    versionCode: parseInt(versionCode),
-                    versionName: versionName,
-                    agregados: agregados || "",
-                    correcciones: correcciones || "",
-                    downloadUrl: `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/${apkPath}`,
-                    timestamp: new Date().toISOString()
-                };
-
-                const versionContent = btoa(JSON.stringify(versionData, null, 2));
-                await uploadToGitHub('public/version.json', versionContent,
-                    `Actualización versión ${versionName} (v${versionCode})`);
-
-                showResult('success', '✅ APK subida y version.json actualizado correctamente en GitHub.');
-                form.reset();
-
+                if (response.ok) {
+                    showResult('success', data.message);
+                    form.reset();
+                } else {
+                    showResult('error', data.error);
+                }
             } catch (error) {
-                console.error('Error:', error);
-                showResult('error', '❌ Error: ' + error.message);
+                showResult('error', 'Error de conexión: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Subir APK a GitHub';
+                submitBtn.textContent = '🚀 Subir APK';
             }
         });
-
-        // Función para leer archivo como base64
-        function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    // Convertir a base64 (remover el data URL prefix)
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Función para subir a GitHub
-        async function uploadToGitHub(path, content, message) {
-            const response = await fetch(
-                `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_CONFIG.token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        content: content,
-                        branch: GITHUB_CONFIG.branch
-                    })
-                }
-            );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `HTTP ${response.status}`);
-            }
-
-            return response.json();
-        }
 
         function showResult(type, message) {
             resultado.className = `resultado ${type}`;
             resultado.textContent = message;
             resultado.style.display = 'block';
-        }
-
-        // Mostrar advertencia si el token no está configurado
-        if (!GITHUB_CONFIG.token || GITHUB_CONFIG.token === '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') {
-            showResult('error', '⚠️ Configura tu token de GitHub en el código JavaScript');
         }
     </script>
 </body>
