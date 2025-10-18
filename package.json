@@ -1,17 +1,8 @@
 {
-  "name": "rujef-updater",
+  "name": "rujef-uploader",
   "version": "1.0.0",
-  "description": "Subida de APK a GitHub vía Vercel",
-  "main": "api/upload.js",
   "type": "module",
-  "scripts": {
-    "start": "vercel dev"
-  },
   "dependencies": {
-    "@octokit/rest": "^19.0.7",
-    "formidable": "^3.1.0"
-  },
-  "engines": {
-    "node": ">=18"
+    "@octokit/rest": "^19.0.7"
   }
 }
